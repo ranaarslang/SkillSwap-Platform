@@ -1,9 +1,12 @@
+import os
 from pathlib import Path
 
+# Production-ready: secrets/hosts come from environment variables.
+# Local dev still works with the defaults below (no env needed).
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = "dev-only-skill-swap-secret"
-DEBUG = True
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-skill-swap-secret")
+DEBUG = os.environ.get("DEBUG", "True") == "True"
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
 
 INSTALLED_APPS = [
     "daphne", "django.contrib.admin", "django.contrib.auth", "django.contrib.contenttypes",
@@ -29,6 +32,6 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
+CORS_ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if o.strip()]
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.TokenAuthentication"], "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"]}
